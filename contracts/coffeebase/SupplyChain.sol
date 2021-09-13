@@ -68,7 +68,10 @@ contract SupplyChain {
 
     // Define a modifer that verifies the Caller
     modifier verifyCaller(address _address) {
-        require(msg.sender == _address, "Sender address doesn't match expected");
+        require(
+            msg.sender == _address,
+            "Sender address doesn't match expected"
+        );
         _;
     }
 
@@ -79,7 +82,7 @@ contract SupplyChain {
     }
 
     // Define a modifier that checks the price and refunds the remaining balance
-    modifier checkValue(uint256 _upc) {
+    modifier refundExcess(uint256 _upc) {
         _;
         uint256 _price = items[_upc].productPrice;
         uint256 amountToReturn = msg.value - _price;
@@ -88,7 +91,10 @@ contract SupplyChain {
 
     // Define a modifier that checks if an item.state of a upc is Harvested
     modifier harvested(uint256 _upc) {
-        require(items[_upc].itemState == State.Harvested, "Item needs to be harvested");
+        require(
+            items[_upc].itemState == State.Harvested,
+            "Item needs to be harvested"
+        );
         _;
     }
 
@@ -203,25 +209,26 @@ contract SupplyChain {
     // Define a function 'packItem' that allows a farmer to mark an item 'Packed'
     function packItem(uint256 _upc)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Call modifier to verify caller of this function
-
+        processed(_upc)
+        verifyCaller(items[_upc].originFarmerID)
     {
-        // Update the appropriate fields
+        items[_upc].itemState = State.Packed;
+
         // Emit the appropriate event
+        emit Packed(_upc);
     }
 
     // Define a function 'sellItem' that allows a farmer to mark an item 'ForSale'
     function sellItem(uint256 _upc, uint256 _price)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Call modifier to verify caller of this function
-
+        packed(_upc)
+        verifyCaller(items[_upc].originFarmerID)
     {
-        // Update the appropriate fields
+        items[_upc].productPrice = _price;
+        items[_upc].itemState = State.ForSale;
+
         // Emit the appropriate event
+        emit ForSale(_upc);
     }
 
     // Define a function 'buyItem' that allows the disributor to mark an item 'Sold'
@@ -230,53 +237,66 @@ contract SupplyChain {
     function buyItem(uint256 _upc)
         public
         payable
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Call modifer to check if buyer has paid enough
-
-    // Call modifer to send any excess ether back to buyer
-
+        forSale(_upc)
+        paidEnough(items[_upc].productPrice)
+        refundExcess(_upc)
     {
         // Update the appropriate fields - ownerID, distributorID, itemState
+        items[_upc].ownerID = msg.sender;
+        items[_upc].distributorID = msg.sender;
+        items[_upc].itemState = State.Sold;
+        
         // Transfer money to farmer
+        payable(items[_upc].originFarmerID).transfer(items[_upc].productPrice);
+
         // emit the appropriate event
+        emit Sold(_upc);
     }
 
     // Define a function 'shipItem' that allows the distributor to mark an item 'Shipped'
     // Use the above modifers to check if the item is sold
     function shipItem(uint256 _upc)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Call modifier to verify caller of this function
-
+        sold(_upc)
+        verifyCaller(items[_upc].distributorID)
     {
         // Update the appropriate fields
+        items[_upc].itemState = State.Shipped;
         // Emit the appropriate event
+        emit Shipped(upc);
     }
 
     // Define a function 'receiveItem' that allows the retailer to mark an item 'Received'
     // Use the above modifiers to check if the item is shipped
     function receiveItem(uint256 _upc)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
+        shipped(_upc)
 
-    // Access Control List enforced by calling Smart Contract / DApp
+    // TODO Access Control List enforced by calling Smart Contract / DApp TODO
     {
         // Update the appropriate fields - ownerID, retailerID, itemState
+        items[_upc].ownerID = msg.sender;
+        items[_upc].retailerID = msg.sender;
+        items[_upc].itemState = State.Received;
+
         // Emit the appropriate event
+        emit Received(upc);
     }
 
     // Define a function 'purchaseItem' that allows the consumer to mark an item 'Purchased'
     // Use the above modifiers to check if the item is received
     function purchaseItem(uint256 _upc)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Access Control List enforced by calling Smart Contract / DApp
+        received(_upc)
+    // TODO Access Control List enforced by calling Smart Contract / DApp
     {
         // Update the appropriate fields - ownerID, consumerID, itemState
+        items[_upc].ownerID = msg.sender;
+        items[_upc].consumerID = msg.sender;
+        items[_upc].itemState = State.Purchased;
+        
         // Emit the appropriate event
+        emit Purchased(_upc);
     }
 
     function getFarmData(uint256 _upc)
@@ -305,6 +325,37 @@ contract SupplyChain {
             result.originFarmInformation,
             result.originFarmLatitude,
             result.originFarmLongitude
+        );
+    }
+
+    function getProductData(uint256 _upc)
+        public
+        view
+        returns (
+            uint256 sku,
+            uint256 upc,
+            address ownerID,
+            uint256 itemState,
+            uint256 productID,
+            string memory productNotes,
+            uint256 productPrice,
+            address distributorID,
+            address retailerID,
+            address consumerID
+        )
+    {
+        Item memory result = items[_upc];
+        return (
+            result.sku,
+            result.upc,
+            result.ownerID,
+            uint256(result.itemState),
+            result.productID,
+            result.productNotes,
+            result.productPrice,
+            result.distributorID,
+            result.retailerID,
+            result.consumerID
         );
     }
 }
