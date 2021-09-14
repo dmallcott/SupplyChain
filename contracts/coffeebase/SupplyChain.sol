@@ -303,8 +303,8 @@ contract SupplyChain {
         public
         view
         returns (
-            uint256 sku,
-            uint256 upc,
+            uint256 _sku,
+            uint256 upc_,
             address ownerID,
             uint256 itemState,
             address originFarmerID,
@@ -332,8 +332,8 @@ contract SupplyChain {
         public
         view
         returns (
-            uint256 sku,
-            uint256 upc,
+            uint256 _sku,
+            uint256 upc_,
             address ownerID,
             uint256 itemState,
             uint256 productID,
