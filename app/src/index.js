@@ -6,7 +6,7 @@ const App = {
   account: null,
   contract: null,
 
-  start: async function() {
+  start: async function () {
     const { web3 } = this;
 
     try {
@@ -27,12 +27,7 @@ const App = {
     }
   },
 
-  showOverviews: function() {
-    document.getElementById("containerFarmDetails").hidden = false;
-    document.getElementById("containerProductDetails").hidden = false;
-  },
-
-  showProductOverview: function(sku, owner) {
+  showProductOverview: function (sku, owner) {
     const skuView = document.getElementById("sku");
     skuView.innerHTML = sku;
 
@@ -42,19 +37,114 @@ const App = {
     document.getElementById("containerProductOverview").hidden = false;
   },
 
+  hideProductOverview: function() {
+    document.getElementById("sku").innerHTML = "---";
+    document.getElementById("owner").innerHTML = "---";
+    document.getElementById("containerProductOverview").hidden = true;
+  },
+
   getProductOverview: async function () {
-    const { getFarmDetails } = this.contract.methods;
+    const getFarmDetailsMethod = this.contract.methods.getFarmDetails;
     const upc = document.getElementById("inputUpc").value;
-    let details = await getFarmDetails(upc).call();
+    let details = await getFarmDetailsMethod(upc).call();
 
-    this.showProductOverview(details._sku, details.ownerID);
+    if (details._sku == 0 && details.ownerID == "0x0000000000000000000000000000000000000000") {
+      this.hideProductOverview();
+      this.showFarmDetails("", "", "", "", "");
+    } else {
+      this.showProductOverview(details._sku, details.ownerID);
+    }
+  },
+
+  fillFarmDetails: function () {
+    this.showFarmDetails(
+      this.account,
+      "Toat Farm",
+      "Yarra Valley",
+      "-38.239770",
+      "144.341490"
+    );
+  },
+
+  showFarmDetails: function (farmerId, farmName, farmInformation, farmLatitude, farmLongitude) {
+    document.getElementById("inputFarmerId").value = farmerId;
+    document.getElementById("inputFarmName").value = farmName;
+    document.getElementById("inputFarmInformation").value = farmInformation;
+    document.getElementById("inputFarmLatitude").value = farmLatitude;
+    document.getElementById("inputFarmLongitude").value = farmLongitude;
+
+    document.getElementById("containerFarmDetails").hidden = false;
+  },
+
+  getFarmDetails: async function () {
+    const getFarmDetailsMethod = this.contract.methods.getFarmDetails;
+    const upc = document.getElementById("inputUpc").value;
+    let details = await getFarmDetailsMethod(upc).call();
+
+    this.showFarmDetails(
+      details.originFarmerID,
+      details.originFarmName,
+      details.originFarmInformation,
+      details.originFarmLatitude,
+      details.originFarmLongitude
+    );
+  },
+
+  _harvest: async function (upc, inputFarmerId, inputFarmName, inputFarmInformation, inputFarmLatitude, inputFarmLongitude) {
+    const harvestItemMethod = this.contract.methods.harvestItem;
+
+    return await harvestItemMethod(
+      upc, inputFarmerId, inputFarmName, inputFarmInformation, inputFarmLatitude, 
+      inputFarmLongitude, ""
+    ).send({from: this.account});
+  },
+
+  harvest: async function () {
+    const upc = document.getElementById("inputUpc").value;
+    const inputFarmerId = document.getElementById("inputFarmerId").value;
+    const inputFarmName = document.getElementById("inputFarmName").value;
+    const inputFarmInformation = document.getElementById("inputFarmInformation").value;
+    const inputFarmLatitude = document.getElementById("inputFarmLatitude").value;
+    const inputFarmLongitude = document.getElementById("inputFarmLongitude").value;
+
+    if (!upc) {
+      document.getElementById("upcMissingAlert").hidden = false;
+      return;
+    }
+
+    if (inputFarmerId && inputFarmName && inputFarmInformation && inputFarmLatitude && inputFarmLongitude) {
+      await this._harvest(upc, inputFarmerId, inputFarmName, inputFarmInformation, inputFarmLatitude, inputFarmLongitude);
+
+      document.getElementById("farmDetailsSuccess").innerHTML = "Product harvested!";
+      document.getElementById("farmDetailsSuccess").hidden = false;
+      document.getElementById("upcMissingAlert").hidden = true;
+      
+      let details = await this.contract.methods.getFarmDetails(upc).call();
+      this.showProductOverview(details._sku, details.ownerID);
+    } else {
+      document.getElementById("farmDetailsAlert").innerHTML = "We're missing some farm information!";
+      document.getElementById("farmDetailsAlert").hidden = false;
+    }
+  },
+
+  process: async function() {
+    const upc = document.getElementById("inputUpc").value;
+
+    if (!upc) {
+      document.getElementById("upcMissingAlert").hidden = false;
+      return;
+    }
+
+    await this.contract.methods.processItem(upc).send({from: this.account});
+  
+    document.getElementById("farmDetailsSuccess").innerHTML = "Product processed!";
+    document.getElementById("farmDetailsSuccess").hidden = false;
   }
-
 };
 
 window.App = App;
 
-window.addEventListener("load", async function() {
+window.addEventListener("load", async function () {
   if (window.ethereum) {
     // use MetaMask's provider
     App.web3 = new Web3(window.ethereum);

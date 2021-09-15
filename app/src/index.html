@@ -20,11 +20,14 @@
   <div class="container">
     <form>
       <div class="mb-3">
-        <label for="upc" class="form-label">UPC</label>
+        <label for="upc" class="form-label">Looking for a specific product?</label>
         <input type="text" class="form-control" id="inputUpc" aria-describedby="upcHelp">
-        <div id="upcHelp" class="form-text">Let's start by fetching the product information</div>
+        <div id="upcHelp" class="form-text">Just input the UPC and we can get started</div>
+
+        <div class="alert alert-danger" role="alert" id="upcMissingAlert" hidden>We need an UPC to do anything</div>
       </div>
       <button type='button' class="btn btn-primary" onclick="App.getProductOverview()">Fetch</button>
+      <button type='button' class="btn btn-secondary" onclick="App.showFarmDetails('','','','','')">I don't have an UPC</button>
     </form>
   </div>
   <br />
@@ -47,13 +50,41 @@
       </div>
     </div>
     <br />
-    <button type="button" class="btn btn-primary ">Fetch farm details</button>
+    <button type="button" class="btn btn-primary" onclick="App.getFarmDetails()">Fetch farm details</button>
     <button type="button" class="btn btn-secondary ">Fetch product details</button>
   </div>
   <br />
   <div class="container" id="containerFarmDetails" hidden>
     <hr>
     <h2>Farm Details</h2>
+    <span class="badge bg-info text-dark" style="cursor: pointer" onclick="App.fillFarmDetails()">Auto-fill form</span>
+    <form>
+      <br>
+      <div class="mb-3">
+        <label for="inputFarmerId" class="form-label">Farmer ID</label>
+        <input type="text" class="form-control" id="inputFarmerId" required>
+      </div>
+      <div class="mb-3">
+        <label for="inputFarmName" class="form-label">Farm Name</label>
+        <input type="text" class="form-control" id="inputFarmName" required>
+      </div>
+      <div class="mb-3">
+        <label for="inputFarmInformation" class="form-label">Farm Information</label>
+        <input type="text" class="form-control" id="inputFarmInformation" required>
+      </div>
+      <div class="mb-3">
+        <label for="inputFarmLatitude" class="form-label">Farm Latitude</label>
+        <input type="text" class="form-control" id="inputFarmLatitude" required>
+      </div>
+      <div class="mb-3">
+        <label for="inputFarmLongitude" class="form-label">Farm Longitude</label>
+        <input type="text" class="form-control" id="inputFarmLongitude" required>
+      </div>
+      <div class="alert alert-success" role="alert" id="farmDetailsSuccess" hidden></div>
+      <div class="alert alert-danger" role="alert" id="farmDetailsAlert" hidden></div>
+      <button type="button" class="btn btn-outline-primary" onclick="App.harvest()">Harvest</button>
+      <button type="button" class="btn btn-outline-primary" onclick="App.process()">Process</button>
+    </form>
   </div>
   <br />
   <div class="container" id="containerProductDetails" hidden>

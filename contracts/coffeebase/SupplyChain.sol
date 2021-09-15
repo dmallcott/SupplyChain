@@ -184,7 +184,7 @@ contract SupplyChain {
             address(0),
             address(0)
         );
-        items[sku] = newItem;
+        items[_upc] = newItem;
 
         // Increment sku
         sku = sku + 1;
