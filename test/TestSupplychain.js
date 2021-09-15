@@ -44,7 +44,7 @@ contract('SupplyChain', function(accounts) {
             args: { "upc": upc, "0": 1, "__length__": 1 }
         }, 'The event is emitted');
         
-        let item = await supplyChain.getFarmData(upc)
+        let item = await supplyChain.getFarmDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['originFarmerID'], originFarmerID, 'Error: Missing or Invalid originFarmerID')
@@ -61,7 +61,7 @@ contract('SupplyChain', function(accounts) {
             args: { "upc": upc, "0": 1, "__length__": 1 }
         }, 'The event is emitted');
         
-        let item = await supplyChain.getFarmData(upc)
+        let item = await supplyChain.getFarmDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['itemState'], 1, 'Error: Invalid item State')
@@ -77,7 +77,7 @@ contract('SupplyChain', function(accounts) {
             args: { "upc": upc, "0": 1, "__length__": 1 }
         }, 'The event is emitted');
         
-        let item = await supplyChain.getFarmData(upc)
+        let item = await supplyChain.getFarmDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['itemState'], 2, 'Error: Invalid item State')
@@ -94,7 +94,7 @@ contract('SupplyChain', function(accounts) {
             args: { "upc": upc, "0": 1, "__length__": 1 }
         }, 'The event is emitted');
         
-        let item = await supplyChain.getProductData(upc)
+        let item = await supplyChain.getProductDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['itemState'], 3, 'Error: Invalid item State')
@@ -111,7 +111,7 @@ contract('SupplyChain', function(accounts) {
             args: { "upc": upc, "0": 1, "__length__": 1 }
         }, 'The event is emitted');
         
-        let item = await supplyChain.getProductData(upc)
+        let item = await supplyChain.getProductDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['itemState'], 4, 'Error: Invalid item State')
@@ -130,7 +130,7 @@ contract('SupplyChain', function(accounts) {
             args: { "upc": upc, "0": 1, "__length__": 1 }
         }, 'The event is emitted');
         
-        let item = await supplyChain.getProductData(upc)
+        let item = await supplyChain.getProductDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['itemState'], 5, 'Error: Invalid item State')
@@ -147,7 +147,7 @@ contract('SupplyChain', function(accounts) {
             args: { "upc": upc, "0": 1, "__length__": 1 }
         }, 'The event is emitted');
         
-        let item = await supplyChain.getProductData(upc)
+        let item = await supplyChain.getProductDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['itemState'], 6, 'Error: Invalid item State')
@@ -165,7 +165,7 @@ contract('SupplyChain', function(accounts) {
             args: { "upc": upc, "0": 1, "__length__": 1 }
         }, 'The event is emitted');
         
-        let item = await supplyChain.getProductData(upc)
+        let item = await supplyChain.getProductDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['itemState'], 7, 'Error: Invalid item State')
@@ -176,7 +176,7 @@ contract('SupplyChain', function(accounts) {
     // 9th Test
     it("Testing smart contract function fetchItemBufferOne() that allows anyone to fetch item details from blockchain", async() => {
         const supplyChain = await SupplyChain.deployed()
-        let item = await supplyChain.getFarmData(upc)
+        let item = await supplyChain.getFarmDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['itemState'], 7, 'Error: Invalid item State')
@@ -190,7 +190,7 @@ contract('SupplyChain', function(accounts) {
         // So had to split the function into two. Any tips on avoiding that?
         
         const supplyChain = await SupplyChain.deployed()
-        let item = await supplyChain.getProductData(upc)
+        let item = await supplyChain.getProductDetails(upc)
 
         assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
         assert.equal(item['itemState'], 7, 'Error: Invalid item State')

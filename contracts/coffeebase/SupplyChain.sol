@@ -299,7 +299,7 @@ contract SupplyChain {
         emit Purchased(_upc);
     }
 
-    function getFarmData(uint256 _upc)
+    function getFarmDetails(uint256 _upc)
         public
         view
         returns (
@@ -328,7 +328,7 @@ contract SupplyChain {
         );
     }
 
-    function getProductData(uint256 _upc)
+    function getProductDetails(uint256 _upc)
         public
         view
         returns (
