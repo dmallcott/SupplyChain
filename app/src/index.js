@@ -27,13 +27,24 @@ const App = {
     }
   },
 
-  showProductOverview: function (sku, owner) {
-    const skuView = document.getElementById("sku");
-    skuView.innerHTML = sku;
+  _stateToString: function(state) {
+    switch (parseInt(state)) {
+      case 0: return "Harvested";
+      case 1: return "Processed";
+      case 2: return "Packed";
+      case 3: return "For Sale";
+      case 4: return "Sold";
+      case 5: return "Shipped";
+      case 6: return "Received";
+      case 7: return "Purchased";
+      default: return "?";
+    }
+  },
 
-    const ownerView = document.getElementById("owner");
-    ownerView.innerHTML = owner;
-
+  showProductOverview: function (sku, owner, state) {  
+    document.getElementById("sku").innerHTML = sku;
+    document.getElementById("owner").innerHTML = owner;
+    document.getElementById("state").innerHTML = this._stateToString(state);
     document.getElementById("containerProductOverview").hidden = false;
   },
 
@@ -52,7 +63,7 @@ const App = {
       this.hideProductOverview();
       this.showFarmDetails("", "", "", "", "");
     } else {
-      this.showProductOverview(details._sku, details.ownerID);
+      this.showProductOverview(details._sku, details.ownerID, details.itemState);
     }
   },
 
@@ -119,12 +130,17 @@ const App = {
       document.getElementById("farmDetailsSuccess").hidden = false;
       document.getElementById("upcMissingAlert").hidden = true;
       
-      let details = await this.contract.methods.getFarmDetails(upc).call();
-      this.showProductOverview(details._sku, details.ownerID);
+      this._refreshProductView();
     } else {
       document.getElementById("farmDetailsAlert").innerHTML = "We're missing some farm information!";
       document.getElementById("farmDetailsAlert").hidden = false;
     }
+  },
+
+  _refreshProductView: async function() {
+    const upc = document.getElementById("inputUpc").value;
+    let details = await this.contract.methods.getFarmDetails(upc).call();
+    this.showProductOverview(details._sku, details.ownerID, details.itemState);
   },
 
   process: async function() {
@@ -139,6 +155,22 @@ const App = {
   
     document.getElementById("farmDetailsSuccess").innerHTML = "Product processed!";
     document.getElementById("farmDetailsSuccess").hidden = false;
+    this._refreshProductView();
+  },
+
+  pack: async function() {
+    const upc = document.getElementById("inputUpc").value;
+
+    if (!upc) {
+      document.getElementById("upcMissingAlert").hidden = false;
+      return;
+    }
+
+    await this.contract.methods.packItem(upc).send({from: this.account});
+  
+    document.getElementById("farmDetailsSuccess").innerHTML = "Product packed!";
+    document.getElementById("farmDetailsSuccess").hidden = false;
+    this._refreshProductView();
   }
 };
 

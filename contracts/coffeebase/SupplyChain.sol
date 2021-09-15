@@ -93,20 +93,20 @@ contract SupplyChain {
     modifier harvested(uint256 _upc) {
         require(
             items[_upc].itemState == State.Harvested,
-            "Item needs to be harvested"
+            "Item needs to be harvested first"
         );
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is Processed
     modifier processed(uint256 _upc) {
-        require(items[_upc].itemState == State.Processed);
+        require(items[_upc].itemState == State.Processed, "Item needs to be processed first");
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is Packed
     modifier packed(uint256 _upc) {
-        require(items[_upc].itemState == State.Packed);
+        require(items[_upc].itemState == State.Packed, "Item needs to be packed first");
         _;
     }
 
