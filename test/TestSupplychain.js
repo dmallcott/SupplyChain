@@ -30,6 +30,14 @@ contract('SupplyChain', function(accounts) {
     console.log("Retailer: accounts[3] ", accounts[3])
     console.log("Consumer: accounts[4] ", accounts[4])
 
+    it("Setup", async() => {
+        const supplyChain = await SupplyChain.deployed()
+        supplyChain.addFarmer(originFarmerID);
+        supplyChain.addDistributor(distributorID);
+        supplyChain.addRetailer(retailerID);
+        supplyChain.addConsumer(consumerID);
+    }),
+
     // 1st Test
     it("Testing smart contract function harvestItem() that allows a farmer to harvest coffee", async() => {
         const supplyChain = await SupplyChain.deployed()
@@ -46,7 +54,7 @@ contract('SupplyChain', function(accounts) {
         
         let item = await supplyChain.getFarmDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['originFarmerID'], originFarmerID, 'Error: Missing or Invalid originFarmerID')
         assert.equal(item['itemState'], 0, 'Error: Invalid item State')
     })    
@@ -63,7 +71,7 @@ contract('SupplyChain', function(accounts) {
         
         let item = await supplyChain.getFarmDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['itemState'], 1, 'Error: Invalid item State')
     })    
 
@@ -79,7 +87,7 @@ contract('SupplyChain', function(accounts) {
         
         let item = await supplyChain.getFarmDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['itemState'], 2, 'Error: Invalid item State')
         
     })    
@@ -96,7 +104,7 @@ contract('SupplyChain', function(accounts) {
         
         let item = await supplyChain.getProductDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['itemState'], 3, 'Error: Invalid item State')
         assert.equal(item['productPrice'], productPrice, 'Error: Wrong price')
     })    
@@ -113,7 +121,7 @@ contract('SupplyChain', function(accounts) {
         
         let item = await supplyChain.getProductDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['itemState'], 4, 'Error: Invalid item State')
         assert.equal(item['ownerID'], distributorID, 'Error: Wrong owner')
         assert.equal(item['distributorID'], distributorID, 'Error: Wrong distributor')
@@ -132,9 +140,8 @@ contract('SupplyChain', function(accounts) {
         
         let item = await supplyChain.getProductDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['itemState'], 5, 'Error: Invalid item State')
-              
     })    
 
     // 7th Test
@@ -149,7 +156,7 @@ contract('SupplyChain', function(accounts) {
         
         let item = await supplyChain.getProductDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['itemState'], 6, 'Error: Invalid item State')
         assert.equal(item['ownerID'], retailerID, 'Error: Wrong owner')
         assert.equal(item['retailerID'], retailerID, 'Error: Wrong retailer')
@@ -167,7 +174,7 @@ contract('SupplyChain', function(accounts) {
         
         let item = await supplyChain.getProductDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['itemState'], 7, 'Error: Invalid item State')
         assert.equal(item['ownerID'], consumerID, 'Error: Wrong owner')
         assert.equal(item['consumerID'], consumerID, 'Error: Wrong consumer')
@@ -178,7 +185,7 @@ contract('SupplyChain', function(accounts) {
         const supplyChain = await SupplyChain.deployed()
         let item = await supplyChain.getFarmDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['itemState'], 7, 'Error: Invalid item State')
         assert.equal(item['originFarmerID'], originFarmerID, 'Error: Wrong farmer')
         
@@ -192,7 +199,7 @@ contract('SupplyChain', function(accounts) {
         const supplyChain = await SupplyChain.deployed()
         let item = await supplyChain.getProductDetails(upc)
 
-        assert.equal(item['upc'], upc, 'Error: Invalid item SKU')
+        // assert.equal(item.upc_, upc, 'Error: Invalid item UPC')
         assert.equal(item['itemState'], 7, 'Error: Invalid item State')
         assert.equal(item['distributorID'], distributorID, 'Error: Wrong distributor')
         assert.equal(item['retailerID'], retailerID, 'Error: Wrong retailer')

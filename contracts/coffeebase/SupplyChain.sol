@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../coffeecore/Ownable.sol";
 import "../coffeeaccesscontrol/FarmerRole.sol";
 import "../coffeeaccesscontrol/DistributorRole.sol";
 import "../coffeeaccesscontrol/RetailerRole.sol";
 import "../coffeeaccesscontrol/ConsumerRole.sol";
 
 // Define a contract 'Supplychain'
-contract SupplyChain {
-    // Define 'owner'
-    address owner;
+contract SupplyChain is Ownable, FarmerRole, ConsumerRole, RetailerRole, DistributorRole {
 
     // Define a variable called 'upc' for Universal Product Code (UPC)
     uint256 upc; // If the UPC is set by the farmer, why would we keep track of it?
@@ -64,12 +63,6 @@ contract SupplyChain {
     event Shipped(uint256 upc);
     event Received(uint256 upc);
     event Purchased(uint256 upc);
-
-    // Define a modifer that checks to see if msg.sender == owner of the contract
-    modifier onlyOwner() {
-        require(msg.sender == owner);
-        _;
-    }
 
     // Define a modifer that verifies the Caller
     modifier verifyCaller(address _address) {
@@ -148,17 +141,14 @@ contract SupplyChain {
     // In the constructor set 'owner' to the address that instantiated the contract
     // and set 'sku' to 1
     // and set 'upc' to 1
-    constructor() payable {
-        owner = msg.sender;
+    constructor() Ownable() FarmerRole() DistributorRole() RetailerRole() ConsumerRole() payable {
         sku = 1;
         upc = 1;
     }
 
     // Define a function 'kill' if required
-    function kill() public {
-        if (msg.sender == owner) {
-            selfdestruct(payable(owner));
-        }
+    function kill() public onlyOwner {
+        selfdestruct(payable(owner()));
     }
 
     // Define a function 'harvestItem' that allows a farmer to mark an item 'Harvested'
@@ -170,7 +160,7 @@ contract SupplyChain {
         string memory _originFarmLatitude,
         string memory _originFarmLongitude,
         string memory _productNotes
-    ) public {
+    ) public onlyFarmer() {
         // Add the new item as part of Harvest
         Item memory newItem = Item(
             sku,
@@ -203,6 +193,7 @@ contract SupplyChain {
         public
         harvested(_upc)
         verifyCaller(items[_upc].originFarmerID)
+        onlyFarmer()
     {
         // Update the appropriate fields
         items[_upc].itemState = State.Processed;
@@ -216,6 +207,7 @@ contract SupplyChain {
         public
         processed(_upc)
         verifyCaller(items[_upc].originFarmerID)
+        onlyFarmer()
     {
         items[_upc].itemState = State.Packed;
 
@@ -228,6 +220,7 @@ contract SupplyChain {
         public
         packed(_upc)
         verifyCaller(items[_upc].originFarmerID)
+        onlyFarmer()
     {
         items[_upc].productPrice = _price;
         items[_upc].itemState = State.ForSale;
@@ -245,6 +238,7 @@ contract SupplyChain {
         forSale(_upc)
         paidEnough(items[_upc].productPrice)
         refundExcess(_upc)
+        onlyDistributor()
     {
         // Update the appropriate fields - ownerID, distributorID, itemState
         items[_upc].ownerID = msg.sender;
@@ -264,6 +258,7 @@ contract SupplyChain {
         public
         sold(_upc)
         verifyCaller(items[_upc].distributorID)
+        onlyDistributor()
     {
         // Update the appropriate fields
         items[_upc].itemState = State.Shipped;
@@ -276,8 +271,7 @@ contract SupplyChain {
     function receiveItem(uint256 _upc)
         public
         shipped(_upc)
-
-    // TODO Access Control List enforced by calling Smart Contract / DApp TODO
+        onlyRetailer()
     {
         // Update the appropriate fields - ownerID, retailerID, itemState
         items[_upc].ownerID = msg.sender;
@@ -293,7 +287,7 @@ contract SupplyChain {
     function purchaseItem(uint256 _upc)
         public
         received(_upc)
-    // TODO Access Control List enforced by calling Smart Contract / DApp
+        onlyConsumer()
     {
         // Update the appropriate fields - ownerID, consumerID, itemState
         items[_upc].ownerID = msg.sender;
