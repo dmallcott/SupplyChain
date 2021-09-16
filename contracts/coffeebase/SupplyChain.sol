@@ -1,13 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../coffeeaccesscontrol/FarmerRole.sol";
+import "../coffeeaccesscontrol/DistributorRole.sol";
+import "../coffeeaccesscontrol/RetailerRole.sol";
+import "../coffeeaccesscontrol/ConsumerRole.sol";
+
 // Define a contract 'Supplychain'
 contract SupplyChain {
     // Define 'owner'
     address owner;
 
     // Define a variable called 'upc' for Universal Product Code (UPC)
-    uint256 upc;
+    uint256 upc; // If the UPC is set by the farmer, why would we keep track of it?
 
     // Define a variable called 'sku' for Stock Keeping Unit (SKU)
     uint256 sku;
