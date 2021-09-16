@@ -26,6 +26,7 @@ Unfortunately I don't have time to deploy the front end in IPFS. Neither can I d
 [activity]: ./images/Activity.png
 [sequence]: ./images/Sequence.png
 [state]: ./images/State.png
+[class]: ./images/Class.png
 
 ### Activity diagram
 
@@ -39,3 +40,13 @@ Unfortunately I don't have time to deploy the front end in IPFS. Neither can I d
 
 ![State][state]
 
+### Class diagram
+
+![Class][class]
+
+
+
+## Working example
+I've taken the librty of including an image of the working product. Hopefully it's useful for the evaluation.
+
+![Example](./images/WorkingExample.png)
