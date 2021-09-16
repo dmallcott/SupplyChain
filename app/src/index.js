@@ -55,7 +55,7 @@ const App = {
   },
 
   _refreshProductView: async function () {
-    const upc = document.getElementById("inputUpc").value;
+    const upc = this._upcFromView();
     let details = await this.contract.methods.getFarmDetails(upc).call();
     this.showProductOverview(details._sku, details.ownerID, details.itemState);
   },
@@ -121,6 +121,17 @@ const App = {
     return (address == "0x0000000000000000000000000000000000000000") ? "" : address;
   },
 
+  _upcFromView: function() {
+    const upc = document.getElementById("inputUpc").value;
+
+    if (!upc) {
+      document.getElementById("upcMissingAlert").hidden = false;
+      throw new Exception("Dodgy dodgy dodgy");
+    }
+
+    return upc;
+  },
+
   showProductDetails: function (productNotes, productPrice, distributorID, retailerID, consumerID) {
     document.getElementById("inputProductNotes").value = productNotes;
     document.getElementById("inputProductPrice").value = (productPrice > 0) ? productPrice : "";
@@ -132,7 +143,7 @@ const App = {
   },
 
   getProductDetails: async function () {
-    const upc = document.getElementById("inputUpc").value;
+    const upc = this._upcFromView();
     let details = await this.contract.methods.getProductDetails(upc).call();
 
     this.showProductDetails(
@@ -211,14 +222,9 @@ const App = {
   },
 
   forSale: async function () {
-    const upc = document.getElementById("inputUpc").value;
+    const upc = this._upcFromView();
     const productPrice = document.getElementById("inputProductPrice").value;
     const productNotes = document.getElementById("inputProductNotes").value;
-
-    if (!upc) {
-      document.getElementById("upcMissingAlert").hidden = false;
-      return;
-    }
 
     if (!productPrice) {
       document.getElementById("productDetailsAlert").innerHTML = "You need to set a price!";
@@ -231,6 +237,18 @@ const App = {
     document.getElementById("productDetailsSuccess").innerHTML = "Product on sale!";
     document.getElementById("productDetailsSuccess").hidden = false;
     this._refreshProductView();
+  },
+
+  buy: async function () {
+    const upc = this._upcFromView();
+    const productPrice = document.getElementById("inputProductPrice").value;
+
+    await this.contract.methods.buyItem(upc).send({ from: this.account, value: this.web3.utils.toWei(productPrice) });
+
+    document.getElementById("productDetailsSuccess").innerHTML = "Product bought!";
+    document.getElementById("productDetailsSuccess").hidden = false;
+    this._refreshProductView();
+    this.getProductDetails();
   }
 };
 
