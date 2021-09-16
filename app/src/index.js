@@ -249,6 +249,42 @@ const App = {
     document.getElementById("productDetailsSuccess").hidden = false;
     this._refreshProductView();
     this.getProductDetails();
+  },
+
+  ship: async function () {
+    const upc = this._upcFromView();
+
+    await this.contract.methods.shipItem(upc).send({ from: this.account });
+
+    document.getElementById("productDetailsSuccess").innerHTML = "Product shipped!";
+    document.getElementById("productDetailsSuccess").hidden = false;
+
+    this._refreshProductView();
+    this.getProductDetails();
+  },
+
+  receive: async function () {
+    const upc = this._upcFromView();
+
+    await this.contract.methods.receiveItem(upc).send({ from: this.account });
+
+    document.getElementById("productDetailsSuccess").innerHTML = "Product received!";
+    document.getElementById("productDetailsSuccess").hidden = false;
+    
+    this._refreshProductView();
+    this.getProductDetails();
+  },
+
+  purchase: async function () {
+    const upc = this._upcFromView();
+
+    await this.contract.methods.purchaseItem(upc).send({ from: this.account });
+
+    document.getElementById("productDetailsSuccess").innerHTML = "Product purchased!";
+    document.getElementById("productDetailsSuccess").hidden = false;
+    
+    this._refreshProductView();
+    this.getProductDetails();
   }
 };
 
