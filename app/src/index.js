@@ -27,7 +27,7 @@ const App = {
     }
   },
 
-  _stateToString: function(state) {
+  _stateToString: function (state) {
     switch (parseInt(state)) {
       case 0: return "Harvested";
       case 1: return "Processed";
@@ -41,17 +41,23 @@ const App = {
     }
   },
 
-  showProductOverview: function (sku, owner, state) {  
+  showProductOverview: function (sku, owner, state) {
     document.getElementById("sku").innerHTML = sku;
     document.getElementById("owner").innerHTML = owner;
     document.getElementById("state").innerHTML = this._stateToString(state);
     document.getElementById("containerProductOverview").hidden = false;
   },
 
-  hideProductOverview: function() {
+  hideProductOverview: function () {
     document.getElementById("sku").innerHTML = "---";
     document.getElementById("owner").innerHTML = "---";
     document.getElementById("containerProductOverview").hidden = true;
+  },
+
+  _refreshProductView: async function () {
+    const upc = document.getElementById("inputUpc").value;
+    let details = await this.contract.methods.getFarmDetails(upc).call();
+    this.showProductOverview(details._sku, details.ownerID, details.itemState);
   },
 
   getProductOverview: async function () {
@@ -101,13 +107,50 @@ const App = {
     );
   },
 
+  fillProductDetails: function () {
+    this.showProductDetails(
+      "Awesome product notes",
+      1,
+      "",
+      "",
+      ""
+    );
+  },
+
+  _sanitiseAddress: function (address) {
+    return (address == "0x0000000000000000000000000000000000000000") ? "" : address;
+  },
+
+  showProductDetails: function (productNotes, productPrice, distributorID, retailerID, consumerID) {
+    document.getElementById("inputProductNotes").value = productNotes;
+    document.getElementById("inputProductPrice").value = (productPrice > 0) ? productPrice : "";
+    document.getElementById("inputDistributorId").value = this._sanitiseAddress(distributorID);
+    document.getElementById("inputRetailerId").value = this._sanitiseAddress(retailerID);
+    document.getElementById("inputConsumerId").value = this._sanitiseAddress(consumerID);
+
+    document.getElementById("containerProductDetails").hidden = false;
+  },
+
+  getProductDetails: async function () {
+    const upc = document.getElementById("inputUpc").value;
+    let details = await this.contract.methods.getProductDetails(upc).call();
+
+    this.showProductDetails(
+      details.productNotes,
+      details.productPrice,
+      details.distributorID,
+      details.retailerID,
+      details.consumerID
+    );
+  },
+
   _harvest: async function (upc, inputFarmerId, inputFarmName, inputFarmInformation, inputFarmLatitude, inputFarmLongitude) {
     const harvestItemMethod = this.contract.methods.harvestItem;
 
     return await harvestItemMethod(
-      upc, inputFarmerId, inputFarmName, inputFarmInformation, inputFarmLatitude, 
+      upc, inputFarmerId, inputFarmName, inputFarmInformation, inputFarmLatitude,
       inputFarmLongitude, ""
-    ).send({from: this.account});
+    ).send({ from: this.account });
   },
 
   harvest: async function () {
@@ -129,7 +172,7 @@ const App = {
       document.getElementById("farmDetailsSuccess").innerHTML = "Product harvested!";
       document.getElementById("farmDetailsSuccess").hidden = false;
       document.getElementById("upcMissingAlert").hidden = true;
-      
+
       this._refreshProductView();
     } else {
       document.getElementById("farmDetailsAlert").innerHTML = "We're missing some farm information!";
@@ -137,13 +180,7 @@ const App = {
     }
   },
 
-  _refreshProductView: async function() {
-    const upc = document.getElementById("inputUpc").value;
-    let details = await this.contract.methods.getFarmDetails(upc).call();
-    this.showProductOverview(details._sku, details.ownerID, details.itemState);
-  },
-
-  process: async function() {
+  process: async function () {
     const upc = document.getElementById("inputUpc").value;
 
     if (!upc) {
@@ -151,14 +188,14 @@ const App = {
       return;
     }
 
-    await this.contract.methods.processItem(upc).send({from: this.account});
-  
+    await this.contract.methods.processItem(upc).send({ from: this.account });
+
     document.getElementById("farmDetailsSuccess").innerHTML = "Product processed!";
     document.getElementById("farmDetailsSuccess").hidden = false;
     this._refreshProductView();
   },
 
-  pack: async function() {
+  pack: async function () {
     const upc = document.getElementById("inputUpc").value;
 
     if (!upc) {
@@ -166,10 +203,33 @@ const App = {
       return;
     }
 
-    await this.contract.methods.packItem(upc).send({from: this.account});
-  
+    await this.contract.methods.packItem(upc).send({ from: this.account });
+
     document.getElementById("farmDetailsSuccess").innerHTML = "Product packed!";
     document.getElementById("farmDetailsSuccess").hidden = false;
+    this._refreshProductView();
+  },
+
+  forSale: async function () {
+    const upc = document.getElementById("inputUpc").value;
+    const productPrice = document.getElementById("inputProductPrice").value;
+    const productNotes = document.getElementById("inputProductNotes").value;
+
+    if (!upc) {
+      document.getElementById("upcMissingAlert").hidden = false;
+      return;
+    }
+
+    if (!productPrice) {
+      document.getElementById("productDetailsAlert").innerHTML = "You need to set a price!";
+      document.getElementById("productDetailsAlert").hidden = false;
+      return;
+    }
+
+    await this.contract.methods.sellItem(upc, productPrice).send({ from: this.account });
+
+    document.getElementById("productDetailsSuccess").innerHTML = "Product on sale!";
+    document.getElementById("productDetailsSuccess").hidden = false;
     this._refreshProductView();
   }
 };

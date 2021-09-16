@@ -57,7 +57,7 @@
     </div>
     <br />
     <button type="button" class="btn btn-primary" onclick="App.getFarmDetails()">Fetch farm details</button>
-    <button type="button" class="btn btn-secondary ">Fetch product details</button>
+    <button type="button" class="btn btn-secondary  "onclick="App.getProductDetails()">Fetch product details</button>
   </div>
   <br />
   <div class="container" id="containerFarmDetails" hidden>
@@ -68,7 +68,8 @@
       <br>
       <div class="mb-3">
         <label for="inputFarmerId" class="form-label">Farmer ID</label>
-        <input type="text" class="form-control" id="inputFarmerId" required>
+        <input type="text" class="form-control" id="inputFarmerId" disabled readonly>
+        <div class="form-text">This field will be set automatically to the account that harvests the product.</div>
       </div>
       <div class="mb-3">
         <label for="inputFarmName" class="form-label">Farm Name</label>
@@ -97,6 +98,38 @@
   <div class="container" id="containerProductDetails" hidden>
     <hr>
     <h2>Product Details</h2>
+    <span class="badge bg-info text-dark" style="cursor: pointer" onclick="App.fillProductDetails()">Auto-fill form</span>
+    <form>
+      <br>
+      <div class="mb-3">
+        <label for="inputProductNotes" class="form-label">Product Notes</label>
+        <input type="text" class="form-control" id="inputProductNotes" required>
+        <div class="form-text">With the current UI, product notes are kinda pointless. They should be set by the distributor instead of the farmer. I don't know if I can modify the contract though.</div>
+      </div>
+      <div class="mb-3">
+        <label for="inputProductPrice" class="form-label">Product Price</label>
+        <input type="text" class="form-control" id="inputProductPrice" required>
+      </div>
+      <div class="mb-3">
+        <label for="inputDistributorId" class="form-label">Distributor ID</label>
+        <input type="text" class="form-control" id="inputDistributorId" disabled readonly>
+        <div class="form-text">This field will be set automatically to the account that buys the product.</div>
+      </div>
+      <div class="mb-3">
+        <label for="inputRetailerId" class="form-label">Retailer ID</label>
+        <input type="text" class="form-control" id="inputRetailerId" disabled readonly>
+        <div class="form-text">This field will be set automatically to the account that receives the product.</div>
+      </div>
+      <div class="mb-3">
+        <label for="inputConsumerId" class="form-label">Consumer ID</label>
+        <input type="text" class="form-control" id="inputConsumerId" disabled readonly>
+        <div class="form-text">This field will be set automatically to the account that purchases the product.</div>
+      </div>
+
+      <div class="alert alert-success" role="alert" id="productDetailsSuccess" hidden></div>
+      <div class="alert alert-danger" role="alert" id="productDetailsAlert" hidden></div>
+      <button type="button" class="btn btn-outline-primary" onclick="App.forSale()">For Sale</button>
+    </form>
   </div>
   <script src="index.js"></script>
 </body>
