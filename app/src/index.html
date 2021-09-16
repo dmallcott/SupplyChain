@@ -27,7 +27,8 @@
         <div class="alert alert-danger" role="alert" id="upcMissingAlert" hidden>We need an UPC to do anything</div>
       </div>
       <button type='button' class="btn btn-primary" onclick="App.getProductOverview()">Fetch</button>
-      <button type='button' class="btn btn-secondary" onclick="App.showFarmDetails('','','','','')">I don't have an UPC</button>
+      <button type='button' class="btn btn-secondary" onclick="App.showFarmDetails('','','','','')">I don't have an
+        UPC</button>
     </form>
   </div>
   <br />
@@ -57,7 +58,7 @@
     </div>
     <br />
     <button type="button" class="btn btn-primary" onclick="App.getFarmDetails()">Fetch farm details</button>
-    <button type="button" class="btn btn-secondary  "onclick="App.getProductDetails()">Fetch product details</button>
+    <button type="button" class="btn btn-secondary  " onclick="App.getProductDetails()">Fetch product details</button>
   </div>
   <br />
   <div class="container" id="containerFarmDetails" hidden>
@@ -98,13 +99,15 @@
   <div class="container" id="containerProductDetails" hidden>
     <hr>
     <h2>Product Details</h2>
-    <span class="badge bg-info text-dark" style="cursor: pointer" onclick="App.fillProductDetails()">Auto-fill form</span>
+    <span class="badge bg-info text-dark" style="cursor: pointer" onclick="App.fillProductDetails()">Auto-fill
+      form</span>
     <form>
       <br>
       <div class="mb-3">
         <label for="inputProductNotes" class="form-label">Product Notes</label>
         <input type="text" class="form-control" id="inputProductNotes" required>
-        <div class="form-text">With the current UI, product notes are kinda pointless. They should be set by the distributor instead of the farmer. I don't know if I can modify the contract though.</div>
+        <div class="form-text">With the current UI, product notes are kinda pointless. They should be set by the
+          distributor instead of the farmer. I don't know if I can modify the contract though.</div>
       </div>
       <div class="mb-3">
         <label for="inputProductPrice" class="form-label">Product Price</label>
@@ -135,6 +138,15 @@
       <button type="button" class="btn btn-outline-primary" onclick="App.receive()">Receive</button>
       <button type="button" class="btn btn-outline-primary" onclick="App.purchase()">Purchase</button>
     </form>
+  </div>
+  <div class="container" id="containerProductDetails">
+    <hr>
+    <h2>Transaction History<span id="ftc-history"></span></h2>
+    <div>
+      <ul id="ftc-events">
+        <!-- Events will appear here -->
+      </ul>
+    </div>
   </div>
   <script src="index.js"></script>
 </body>

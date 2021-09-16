@@ -178,13 +178,14 @@ const App = {
     }
 
     if (inputFarmerId && inputFarmName && inputFarmInformation && inputFarmLatitude && inputFarmLongitude) {
-      await this._harvest(upc, inputFarmerId, inputFarmName, inputFarmInformation, inputFarmLatitude, inputFarmLongitude);
+      let result = await this._harvest(upc, inputFarmerId, inputFarmName, inputFarmInformation, inputFarmLatitude, inputFarmLongitude);
 
       document.getElementById("farmDetailsSuccess").innerHTML = "Product harvested!";
       document.getElementById("farmDetailsSuccess").hidden = false;
       document.getElementById("upcMissingAlert").hidden = true;
 
       this._refreshProductView();
+      this._addTransactionHistory(result);
     } else {
       document.getElementById("farmDetailsAlert").innerHTML = "We're missing some farm information!";
       document.getElementById("farmDetailsAlert").hidden = false;
@@ -199,11 +200,12 @@ const App = {
       return;
     }
 
-    await this.contract.methods.processItem(upc).send({ from: this.account });
+    let result = await this.contract.methods.processItem(upc).send({ from: this.account });
 
     document.getElementById("farmDetailsSuccess").innerHTML = "Product processed!";
     document.getElementById("farmDetailsSuccess").hidden = false;
     this._refreshProductView();
+    this._addTransactionHistory(result);
   },
 
   pack: async function () {
@@ -214,11 +216,12 @@ const App = {
       return;
     }
 
-    await this.contract.methods.packItem(upc).send({ from: this.account });
+    let result = await this.contract.methods.packItem(upc).send({ from: this.account });
 
     document.getElementById("farmDetailsSuccess").innerHTML = "Product packed!";
     document.getElementById("farmDetailsSuccess").hidden = false;
     this._refreshProductView();
+    this._addTransactionHistory(result);
   },
 
   forSale: async function () {
@@ -232,59 +235,74 @@ const App = {
       return;
     }
 
-    await this.contract.methods.sellItem(upc, productPrice).send({ from: this.account });
+    let result = await this.contract.methods.sellItem(upc, productPrice).send({ from: this.account });
 
     document.getElementById("productDetailsSuccess").innerHTML = "Product on sale!";
     document.getElementById("productDetailsSuccess").hidden = false;
     this._refreshProductView();
+    this._addTransactionHistory(result);
   },
 
   buy: async function () {
     const upc = this._upcFromView();
     const productPrice = document.getElementById("inputProductPrice").value;
 
-    await this.contract.methods.buyItem(upc).send({ from: this.account, value: this.web3.utils.toWei(productPrice) });
+    let result = await this.contract.methods.buyItem(upc).send({ from: this.account, value: this.web3.utils.toWei(productPrice) });
 
     document.getElementById("productDetailsSuccess").innerHTML = "Product bought!";
     document.getElementById("productDetailsSuccess").hidden = false;
     this._refreshProductView();
     this.getProductDetails();
+    this._addTransactionHistory(result);
   },
 
   ship: async function () {
     const upc = this._upcFromView();
 
-    await this.contract.methods.shipItem(upc).send({ from: this.account });
+    let result = await this.contract.methods.shipItem(upc).send({ from: this.account });
 
     document.getElementById("productDetailsSuccess").innerHTML = "Product shipped!";
     document.getElementById("productDetailsSuccess").hidden = false;
 
     this._refreshProductView();
     this.getProductDetails();
+    this._addTransactionHistory(result);
   },
 
   receive: async function () {
     const upc = this._upcFromView();
 
-    await this.contract.methods.receiveItem(upc).send({ from: this.account });
+    let result = await this.contract.methods.receiveItem(upc).send({ from: this.account });
 
     document.getElementById("productDetailsSuccess").innerHTML = "Product received!";
     document.getElementById("productDetailsSuccess").hidden = false;
     
     this._refreshProductView();
     this.getProductDetails();
+    this._addTransactionHistory(result);
   },
 
   purchase: async function () {
     const upc = this._upcFromView();
 
-    await this.contract.methods.purchaseItem(upc).send({ from: this.account });
+    let result = await this.contract.methods.purchaseItem(upc).send({ from: this.account });
 
     document.getElementById("productDetailsSuccess").innerHTML = "Product purchased!";
     document.getElementById("productDetailsSuccess").hidden = false;
     
     this._refreshProductView();
     this.getProductDetails();
+    this._addTransactionHistory(result);
+  },
+
+  _addTransactionHistory: function(result) {
+    // My frontend code is dodgy haha
+    var ul = document.getElementById("ftc-events");
+    console.log(result);
+    var li = document.createElement("li");
+    var body = Object.keys(result.events)[0].toString() + " - " + result.transactionHash.toString();
+    li.appendChild(document.createTextNode(body));
+    ul.appendChild(li);
   }
 };
 
